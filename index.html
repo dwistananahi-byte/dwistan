@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aplikasi Program Diet OGANI</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f6fa;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .page-view {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .page-view.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+        /* Hide scrollbar for carousel but keep functionality */
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-sm text-gray-800 antialiased">
+
+    <div class="max-w-lg mx-auto bg-white min-h-screen shadow-xl border-x border-gray-100 relative overflow-x-hidden flex flex-col">
+        
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('page-home')">
+                    <div class="w-7 h-7 bg-[#7fad39] rounded-full flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-leaf text-white text-[12px]"></i>
+                    </div>
+                    <h1 class="text-2xl font-extrabold text-[#1c1c1c] tracking-tight">OGANI</h1>
+                </div>
+                <button onclick="toggleSidebar()" class="p-1.5 border border-gray-300 rounded hover:bg-gray-50 text-[#1c1c1c] transition-colors">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar Overlay & Menu -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 z-40 hidden transition-opacity"></div>
+        <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white z-50 transform -translate-x-full transition-transform duration-300 shadow-2xl overflow-y-auto">
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 bg-[#7fad39] rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-leaf text-white text-[12px]"></i>
+                    </div>
+                    <h1 class="text-2xl font-extrabold text-[#1c1c1c]">OGANI</h1>
+                </div>
+            </div>
+            <nav class="p-2 space-y-1 mt-2">
+                <button onclick="navigateTo('page-home')" class="w-full text-left px-4 py-3 text-[13px] font-medium text-gray-700 hover:text-[#7fad39] hover:bg-green-50 rounded transition-colors"><i class="fa-solid fa-house w-6 text-center"></i> Halaman Utama</button>
+                <button onclick="navigateTo('page-hitung-kalori')" class="w-full text-left px-4 py-3 text-[13px] font-medium text-gray-700 hover:text-[#7fad39] hover:bg-green-50 rounded transition-colors"><i class="fa-solid fa-calculator w-6 text-center"></i> Hitung Kebutuhan Kalorimu</button>
+                <button onclick="navigateTo('page-hitung-bmi')" class="w-full text-left px-4 py-3 text-[13px] font-medium text-gray-700 hover:text-[#7fad39] hover:bg-green-50 rounded transition-colors"><i class="fa-solid fa-weight-scale w-6 text-center"></i> Hitung Tingkat Obesitasmu</button>
+                <button onclick="navigateTo('page-jadwal-diet')" class="w-full text-left px-4 py-3 text-[13px] font-medium text-gray-700 hover:text-[#7fad39] hover:bg-green-50 rounded transition-colors"><i class="fa-regular fa-calendar-check w-6 text-center"></i> Jadwal Kegiatan Diet Anda</button>
+                <button onclick="navigateTo('page-jadwal-olahraga')" class="w-full text-left px-4 py-3 text-[13px] font-medium text-gray-700 hover:text-[#7fad39] hover:bg-green-50 rounded transition-colors"><i class="fa-solid fa-person-running w-6 text-center"></i> Jadwal Olahraga</button>
+                <button onclick="navigateTo('page-history')" class="w-full text-left px-4 py-3 text-[13px] font-medium text-gray-700 hover:text-[#7fad39] hover:bg-green-50 rounded transition-colors"><i class="fa-solid fa-clock-rotate-left w-6 text-center"></i> History</button>
+            </nav>
+        </div>
+
+        <main class="flex-1 w-full bg-white">
+            
+            <!-- Halaman Utama (Beranda) -->
+            <div id="page-home" class="page-view active pb-10">
+                <div class="px-4 py-6 space-y-8">
+                    
+                    <!-- Kategori Dropdown -->
+                    <div class="w-full shadow-sm rounded-sm border border-gray-100 overflow-hidden">
+                        <button onclick="toggleDropdown('kalori-dropdown')" class="w-full bg-[#7fad39] text-white flex items-center justify-between p-3.5 font-bold text-[13px] hover:bg-[#6e9631] transition-colors">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-bars"></i>
+                                <span class="uppercase tracking-wide">Kalori Makanan</span>
+                            </div>
+                            <i id="kalori-dropdown-icon" class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+                        </button>
+                        <div id="kalori-dropdown" class="bg-white border-x border-b border-gray-100 hidden">
+                            <button onclick="navigateTo('page-tabel-buah')" class="w-full text-left px-5 py-3.5 text-[12px] font-semibold text-gray-700 hover:text-[#7fad39] hover:bg-green-50 border-b border-gray-50 flex items-center gap-3"><i class="fa-solid fa-apple-whole text-red-500 w-4 text-center"></i> Buah</button>
+                            <button onclick="navigateTo('page-tabel-sayuran')" class="w-full text-left px-5 py-3.5 text-[12px] font-semibold text-gray-700 hover:text-[#7fad39] hover:bg-green-50 border-b border-gray-50 flex items-center gap-3"><i class="fa-solid fa-carrot text-orange-400 w-4 text-center"></i> Sayuran</button>
+                            <button onclick="navigateTo('page-tabel-pokok')" class="w-full text-left px-5 py-3.5 text-[12px] font-semibold text-gray-700 hover:text-[#7fad39] hover:bg-green-50 border-b border-gray-50 flex items-center gap-3"><i class="fa-solid fa-bowl-rice text-gray-400 w-4 text-center"></i> Makanan Pokok</button>
+                            <button onclick="navigateTo('page-tabel-rendah-karbo')" class="w-full text-left px-5 py-3.5 text-[12px] font-semibold text-gray-700 hover:text-[#7fad39] hover:bg-green-50 border-b border-gray-50 flex items-center gap-3"><i class="fa-solid fa-wheat-awn text-yellow-600 w-4 text-center"></i> Diet Rendah Karbohidrat</button>
+                            <button onclick="navigateTo('page-tabel-rendah-lemak')" class="w-full text-left px-5 py-3.5 text-[12px] font-semibold text-gray-700 hover:text-[#7fad39] hover:bg-green-50 flex items-center gap-3"><i class="fa-solid fa-droplet-slash text-blue-400 w-4 text-center"></i> Diet Rendah Lemak</button>
+                        </div>
+                    </div>
+
+                    <!-- Banner Sayuran Organik -->
+                    <div class="bg-[#f3f6fa] p-6 flex flex-col justify-center relative overflow-hidden h-[220px] rounded-sm shadow-sm border border-gray-100">
+                        <div class="space-y-2.5 z-10 w-[60%]">
+                            <span class="text-[#7fad39] font-extrabold text-[10px] tracking-widest uppercase"><i class="fa-solid fa-leaf"></i> Sayuran Segar</span>
+                            <h2 class="text-[26px] font-extrabold text-[#1c1c1c] leading-tight">Sayuran<br />100% Organic</h2>
+                            <p class="text-gray-500 text-[10px] pb-1">Jadikan Menu Kebutuhan Diet mu</p>
+                            <button class="bg-[#7fad39] text-white font-bold text-[9px] px-4 py-2 rounded-sm uppercase tracking-wide"><i class="fa-solid fa-basket-shopping"></i> Sayuran Organik</button>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?auto=format&fit=crop&w=400&q=80" alt="Sayuran Organik" class="absolute right-[-40px] bottom-0 h-48 w-48 object-cover rounded-full border-4 border-white shadow-lg z-0" />
+                    </div>
+
+                    <!-- Carousel / Slider 5 Menu (Fresh Fruit, Dried Fruit, Vegetables, Drink Fruit, Meat) -->
+                    <div class="relative flex items-center justify-center -mx-2">
+                        <button onclick="prevSlide()" class="absolute left-0 z-10 bg-white w-7 h-7 flex items-center justify-center rounded-full shadow-md border border-gray-100 text-gray-400 hover:text-[#7fad39] transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                        
+                        <div class="w-[85%] overflow-hidden py-2 hide-scroll">
+                            <div id="carousel-track" class="flex transition-transform duration-500 ease-in-out">
+                                <!-- JS akan memuat isi carousel disini secara dinamis -->
+                            </div>
+                        </div>
+
+                        <button onclick="nextSlide()" class="absolute right-0 z-10 bg-white w-7 h-7 flex items-center justify-center rounded-full shadow-md border border-gray-100 text-gray-400 hover:text-[#7fad39] transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                    </div>
+
+                    <!-- Tips Diet Section -->
+                    <section class="pt-4 border-t border-gray-100">
+                        <div class="text-center mb-8">
+                            <h2 class="text-[22px] font-extrabold text-[#1c1c1c] flex items-center justify-center gap-2"><i class="fa-regular fa-lightbulb text-yellow-500"></i> Tips Diet</h2>
+                            <div class="w-16 h-1 bg-[#7fad39] mx-auto mt-2"></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <!-- Artikel 1 -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-1.5 text-[8px] text-gray-400 font-medium">
+                                    <span><i class="fa-regular fa-calendar"></i> May 4,2019</span>
+                                    <span><i class="fa-regular fa-comment"></i> 5</span>
+                                </div>
+                                <h4 class="font-extrabold text-[12px] text-[#1c1c1c] leading-tight hover:text-[#7fad39] cursor-pointer">Hitung Kebutuhan Kalori</h4>
+                                <p class="text-[10px] text-gray-500 leading-relaxed text-left line-clamp-6">Cara pertama yang tepat untuk memulai diet yaitu dengan menghitung kebutuhan kalori. Pasalnya, setiap orang memiliki kebutuhan kalori yang berbeda-beda. Ada banyak faktor yang mempengaruhinya...</p>
+                                <div class="h-1 bg-[#7fad39] w-[60%] mt-1 rounded-full"></div>
+                            </div>
+                            <!-- Artikel 2 -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-1.5 text-[8px] text-gray-400 font-medium">
+                                    <span><i class="fa-regular fa-calendar"></i> May 4,2019</span>
+                                    <span><i class="fa-regular fa-comment"></i> 5</span>
+                                </div>
+                                <h4 class="font-extrabold text-[12px] text-[#1c1c1c] leading-tight hover:text-[#7fad39] cursor-pointer">Buat Jadwal Makan Teratur</h4>
+                                <p class="text-[10px] text-gray-500 leading-relaxed text-left line-clamp-6">Dalam menjalani diet sehat, hindari melewatkan waktu makan. Pasalnya, melewatkan waktu makan justru membuat tubuh menjadi cepat lapar, gula darah naik dan turun secara drastis, dan dapat memicu stress...</p>
+                            </div>
+                            <!-- Artikel 3 -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-1.5 text-[8px] text-gray-400 font-medium">
+                                    <span><i class="fa-regular fa-calendar"></i> May 4,2019</span>
+                                    <span><i class="fa-regular fa-comment"></i> 5</span>
+                                </div>
+                                <h4 class="font-extrabold text-[12px] text-[#1c1c1c] leading-tight hover:text-[#7fad39] cursor-pointer">Atur Porsi Makan</h4>
+                                <p class="text-[10px] text-gray-500 leading-relaxed text-left line-clamp-6">Jika ingin diet sehat, Realfoodfam tidak harus menghindari berbagai jenis makanan. Melainkan, cukup menyesuaikan porsi makan dengan prinsip gizi seimbang. Misalnya, Realfoodfam bisa membagi piring...</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div id="page-hitung-kalori" class="page-view px-5 py-6">
+                <h2 class="text-[15px] font-bold text-[#1c1c1c] mb-4">Kebutuhan Kalorimu Per Hari</h2>
+                <div class="w-full border-b border-gray-100 mb-6"></div>
+                
+                <div id="form-kalori" class="max-w-md">
+                    <input type="text" id="kalori-nama" placeholder="Masukkan Nama" class="w-full p-3 mb-4 border border-gray-100 text-[13px] placeholder:text-gray-400 focus:outline-none focus:border-[#7fad39] rounded-none">
+                    <input type="number" id="kalori-berat" placeholder="Masukkan Berat Badanmu (Kg)" class="w-full p-3 mb-4 border border-gray-100 text-[13px] placeholder:text-gray-400 focus:outline-none focus:border-[#7fad39] rounded-none">
+                    <input type="number" id="kalori-tinggi" placeholder="Masukkan Tinggi mu (cm)" class="w-full p-3 mb-4 border border-gray-100 text-[13px] placeholder:text-gray-400 focus:outline-none focus:border-[#7fad39] rounded-none">
+                    <input type="number" id="kalori-usia" placeholder="Usia/umur" class="w-full p-3 mb-4 border border-gray-100 text-[13px] placeholder:text-gray-400 focus:outline-none focus:border-[#7fad39] rounded-none">
+                    <input type="text" id="kalori-pekerjaan" placeholder="Pekerjaan" class="w-full p-3 mb-4 border border-gray-100 text-[13px] placeholder:text-gray-400 focus:outline-none focus:border-[#7fad39] rounded-none">
+                    
+                    <select id="kalori-aktivitas" class="w-full p-3 mb-4 border border-gray-100 text-[13px] text-gray-600 bg-white focus:outline-none focus:border-[#7fad39] rounded-none appearance-none">
+                        <option value="1.2">Seberapa Aktif Kamu</option>
+                        <option value="1.2">Jarang berolahraga (1.2)</option>
+                        <option value="1.375">Olahraga ringan (1.375)</option>
+                        <option value="1.55">Olahraga sedang (1.55)</option>
+                        <option value="1.725">Olahraga berat (1.725)</option>
+                    </select>
+
+                    <button onclick="prosesKalori()" class="bg-[#7fad39] text-white font-bold text-[11px] px-6 py-3 mt-2 hover:bg-[#6e9631] uppercase tracking-wide rounded-none">PROSES</button>
+                    <p id="error-kalori" class="text-red-500 text-[11px] mt-2 hidden">Mohon lengkapi semua data dengan benar.</p>
+                </div>
+
+                <div id="hasil-kalori" class="hidden mt-10 pb-10">
+                    <div class="bg-[#f5f5f5] p-6 shadow-sm mb-12 border border-gray-50">
+                        <h3 class="text-[16px] font-extrabold text-[#1c1c1c] mb-4">Kebutuhan Kalori mu</h3>
+                        <div class="w-full border-b border-gray-200 mb-3"></div>
+                        <table class="w-full text-[12px]">
+                            <thead>
+                                <tr class="text-left border-b border-gray-200">
+                                    <th class="pb-3 pt-2 font-extrabold text-[#1c1c1c]">Products</th>
+                                    <th class="pb-3 pt-2 font-extrabold text-[#1c1c1c] text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="leading-loose">
+                                <tr><td class="py-2 text-gray-500">Nama</td><td id="res-k-nama" class="py-2 font-bold text-gray-800 text-right uppercase"></td></tr>
+                                <tr><td class="py-2 text-gray-500">Berat Badan</td><td id="res-k-berat" class="py-2 font-bold text-gray-800 text-right"></td></tr>
+                                <tr><td class="py-2 text-gray-500">Tinggi Badan</td><td id="res-k-tinggi" class="py-2 font-bold text-gray-800 text-right"></td></tr>
+                                <tr><td class="py-2 text-gray-500">Usia</td><td id="res-k-usia" class="py-2 font-bold text-gray-800 text-right"></td></tr>
+                                <tr><td class="py-2 text-gray-500">Tingkat aktivitas bergerak</td><td id="res-k-aktivitas" class="py-2 font-bold text-gray-800 text-right"></td></tr>
+                                <tr class="border-t border-gray-200">
+                                    <td class="py-4 font-extrabold text-[#1c1c1c]">Jumlah KKL perhari</td>
+                                    <td id="res-k-total" class="py-4 font-extrabold text-[#d62828] text-right"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-center w-full">
+                        <h2 class="text-[20px] font-extrabold text-[#1c1c1c]">Menu sehat untuk untuk asupan diet mu</h2>
+                        <div class="w-16 h-1 bg-[#7fad39] mx-auto mt-3 mb-8"></div>
+                        <div class="grid grid-cols-3 gap-4 text-left items-start">
+                            <div>
+                                <h4 class="font-extrabold text-[#1c1c1c] mb-2 text-[13px]">Menu Pertama</h4>
+                                <p class="text-gray-500 text-[10px] leading-relaxed">sarapan, salad buah dengan the herbal madu (230 kalori) untuk makan siang, tumis ayam brokoli dengan nasi merah (350 kalori) untuk makan malam, ayam teriyaki dengan selada (685 kalori)</p>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-[#1c1c1c] mb-2 text-[13px]">menu kedua</h4>
+                                <p class="text-gray-500 text-[10px] leading-relaxed">untuk sarapan, roti panggang alpukat dan telur (266 kalori) untuk makan siang, tumis sayur dan ubi manis panggang (460 kalori) untuk makan malam, roti lapis salmon (540 kalori)</p>
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-[#1c1c1c] mb-2 text-[13px]">menu Ketiga</h4>
+                                <p class="text-gray-500 text-[10px] leading-relaxed">untuk sarapan, roti lapis ayam dengan yogurt, kiwi dan jus sayur (260 kalori) untuk makan siang, salad sayuran dan ayam rebus dengan apel jeruk (448 kalori) untuk makan malam, ikan dori dan saus lemon mentega (576 kalori)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-hitung-bmi" class="page-view px-5 py-6">
+                <h2 class="text-[15px] font-bold text-[#1c1c1c] mb-4">Hitung Indeks Massa Tubuh</h2>
+                <div class="w-full border-b border-gray-100 mb-6"></div>
+                
+                <div class="max-w-md">
+                    <input type="text" id="bmi-nama" placeholder="Masukkan Nama" class="w-full p-3 mb-4 border border-gray-100 text-[13px] focus:outline-none focus:border-[#7fad39] rounded-none">
+                    <input type="number" id="bmi-berat" placeholder="Masukkan Berat Badanmu (Kg)" class="w-full p-3 mb-4 border border-gray-100 text-[13px] focus:outline-none focus:border-[#7fad39] rounded-none">
+                    <input type="number" id="bmi-tinggi" placeholder="Masukkan Tinggi mu (cm)" class="w-full p-3 mb-4 border border-gray-100 text-[13px] focus:outline-none focus:border-[#7fad39] rounded-none">
+                    <input type="number" id="bmi-usia" placeholder="Usia/umur" class="w-full p-3 mb-4 border border-gray-100 text-[13px] focus:outline-none focus:border-[#7fad39] rounded-none">
+                    <input type="text" id="bmi-pekerjaan" placeholder="Pekerjaan" class="w-full p-3 mb-4 border border-gray-100 text-[13px] focus:outline-none focus:border-[#7fad39] rounded-none">
+                    
+                    <button onclick="prosesBmi()" class="bg-[#7fad39] text-white font-bold text-[11px] px-6 py-3 mt-2 hover:bg-[#6e9631] uppercase tracking-wide rounded-none">PROSES</button>
+                    <p id="error-bmi" class="text-red-500 text-[11px] mt-2 hidden">Mohon lengkapi data dengan benar.</p>
+                </div>
+
+                <div id="hasil-bmi" class="hidden bg-[#f5f5f5] p-5 border-l-4 border-[#7fad39] mt-6 shadow-sm">
+                    <p class="text-[12px] text-gray-500 mb-1">Skor IMT untuk <span id="res-bmi-nama" class="font-bold"></span>:</p>
+                    <h3 id="res-bmi-skor" class="text-[24px] font-extrabold text-[#1c1c1c] mb-1"></h3>
+                    <p class="text-[13px] text-[#7fad39] font-bold mt-1 mb-4">Kategori: <span id="res-bmi-status"></span></p>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="navigateTo('page-jadwal-diet')" class="bg-[#7fad39] text-white font-bold text-[11px] px-6 py-3 rounded-none hover:bg-[#6e9631] uppercase text-center">LIHAT JADWAL DIET</button>
+                        <button onclick="navigateTo('page-jadwal-olahraga')" class="bg-white border border-[#7fad39] text-[#7fad39] font-bold text-[11px] px-6 py-3 rounded-none hover:bg-gray-50 uppercase text-center">LIHAT JADWAL OLAHRAGA</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-jadwal-diet" class="page-view px-5 py-6">
+                <h2 class="text-[15px] font-bold text-[#1c1c1c] mb-2">Jadwal Kegiatan Diet Anda</h2>
+                <div class="w-full border-b border-gray-100 mb-4"></div>
+
+                <div id="diet-no-data" class="bg-[#f5f5f5] p-5 border border-gray-100 text-center shadow-sm">
+                    <p class="text-[12px] text-gray-500 mb-4">Anda belum menghitung Tingkat Obesitas (IMT). Jadwal diet disesuaikan khusus berdasarkan hasil IMT Anda.</p>
+                    <button onclick="navigateTo('page-hitung-bmi')" class="bg-[#7fad39] text-white font-bold text-[11px] px-6 py-3 rounded-none uppercase">HITUNG IMT SEKARANG</button>
+                </div>
+
+                <div id="diet-has-data" class="hidden">
+                    <div class="bg-[#f5f5f5] p-4 border-l-4 border-[#7fad39] shadow-sm mb-6 flex justify-between items-center">
+                        <div>
+                            <p class="text-[11px] text-gray-500 mb-1">Skor IMT Terakhir Anda:</p>
+                            <p id="diet-imt-status" class="text-[13px] font-bold text-[#7fad39]"></p>
+                        </div>
+                        <h3 id="diet-imt-skor" class="text-[24px] font-extrabold text-[#1c1c1c]"></h3>
+                    </div>
+                    <div class="bg-[#f5f5f5] p-5 border border-gray-100 shadow-sm">
+                        <p class="text-[13px] text-[#7fad39] font-extrabold mb-3 uppercase">Menu Harian Rekomendasi:</p>
+                        <ul class="text-[12px] text-gray-600 list-disc pl-4 mb-5 space-y-2">
+                            <li><strong>Sarapan:</strong> <span id="diet-pagi"></span></li>
+                            <li><strong>Makan Siang:</strong> <span id="diet-siang"></span></li>
+                            <li><strong>Makan Malam:</strong> <span id="diet-malam"></span></li>
+                        </ul>
+                        <div class="border-t border-gray-200 pt-3">
+                            <p class="text-[10px] text-gray-400 italic">*Menu ini disesuaikan secara otomatis berdasarkan kategori berat badan Anda.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-jadwal-olahraga" class="page-view px-5 py-6">
+                <h2 class="text-[15px] font-bold text-[#1c1c1c] mb-2">Jadwal Olahraga Anda</h2>
+                <div class="w-full border-b border-gray-100 mb-4"></div>
+
+                <div id="sport-no-data" class="bg-[#f5f5f5] p-5 border border-gray-100 text-center shadow-sm">
+                    <p class="text-[12px] text-gray-500 mb-4">Anda belum menghitung Tingkat Obesitas (IMT). Jadwal olahraga disesuaikan khusus berdasarkan hasil IMT Anda.</p>
+                    <button onclick="navigateTo('page-hitung-bmi')" class="bg-[#7fad39] text-white font-bold text-[11px] px-6 py-3 rounded-none uppercase">HITUNG IMT SEKARANG</button>
+                </div>
+
+                <div id="sport-has-data" class="hidden">
+                    <div class="bg-[#f5f5f5] p-4 border-l-4 border-[#7fad39] shadow-sm mb-6 flex justify-between items-center">
+                        <div>
+                            <p class="text-[11px] text-gray-500 mb-1">Skor IMT Terakhir Anda:</p>
+                            <p id="sport-imt-status" class="text-[13px] font-bold text-[#7fad39]"></p>
+                        </div>
+                        <h3 id="sport-imt-skor" class="text-[24px] font-extrabold text-[#1c1c1c]"></h3>
+                    </div>
+                    <div class="bg-[#f5f5f5] p-5 border border-gray-100 shadow-sm border-l-4 border-l-[#7fad39]">
+                        <p class="text-[13px] text-[#7fad39] font-extrabold mb-3 uppercase">Rekomendasi Olahraga Mingguan:</p>
+                        <ul class="text-[12px] text-gray-600 list-disc pl-4 mb-5 space-y-2">
+                            <li><strong>Senin:</strong> <span id="sport-senin"></span></li>
+                            <li><strong>Rabu:</strong> <span id="sport-rabu"></span></li>
+                            <li><strong>Jumat:</strong> <span id="sport-jumat"></span></li>
+                        </ul>
+                        <div class="border-t border-gray-200 pt-3">
+                            <p class="text-[11px] text-[#1c1c1c] font-bold mb-1">Catatan Penting:</p>
+                            <p id="sport-catatan" class="text-[10px] text-gray-500 italic"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-tabel-buah" class="page-view px-5 py-6">
+                <div class="bg-[#f5f5f5] p-6 shadow-sm border border-gray-50">
+                    <h3 class="text-[16px] font-bold text-[#1c1c1c] mb-4">Kalori Pada Buah</h3>
+                    <div class="w-full border-b border-gray-200 mb-3"></div>
+                    <table class="w-full text-[12px]">
+                        <thead><tr class="text-left border-b border-gray-200"><th class="pb-3 pt-2 font-bold text-[#1c1c1c]">Buah</th><th class="pb-3 pt-2 font-bold text-[#1c1c1c] text-right">Kalori</th></tr></thead>
+                        <tbody class="leading-loose">
+                            <tr><td class="py-2 text-gray-500">Apel 160 gram</td><td class="py-2 font-bold text-gray-800 text-right">92</td></tr>
+                            <tr><td class="py-2 text-gray-500">Nenas 200 gram</td><td class="py-2 font-bold text-gray-800 text-right">104</td></tr>
+                            <tr><td class="py-2 text-gray-500">Pepaya 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">46</td></tr>
+                            <tr><td class="py-2 text-gray-500">Mangga 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">72</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-tabel-sayuran" class="page-view px-5 py-6">
+                <div class="bg-[#f5f5f5] p-6 shadow-sm border border-gray-50">
+                    <h3 class="text-[16px] font-bold text-[#1c1c1c] mb-4">Kalori Pada Sayuran</h3>
+                    <div class="w-full border-b border-gray-200 mb-3"></div>
+                    <table class="w-full text-[12px]">
+                        <thead><tr class="text-left border-b border-gray-200"><th class="pb-3 pt-2 font-bold text-[#1c1c1c]">Sayuran</th><th class="pb-3 pt-2 font-bold text-[#1c1c1c] text-right">Kalori</th></tr></thead>
+                        <tbody class="leading-loose">
+                            <tr><td class="py-2 text-gray-500">Bening bayam 160 gram</td><td class="py-2 font-bold text-gray-800 text-right">92</td></tr>
+                            <tr><td class="py-2 text-gray-500">Acar kuning 200 gram</td><td class="py-2 font-bold text-gray-800 text-right">104</td></tr>
+                            <tr><td class="py-2 text-gray-500">Cah Labbu siam 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">46</td></tr>
+                            <tr><td class="py-2 text-gray-500">ManSayur Asam 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">72</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-tabel-pokok" class="page-view px-5 py-6">
+                <div class="bg-[#f5f5f5] p-6 shadow-sm border border-gray-50">
+                    <h3 class="text-[16px] font-bold text-[#1c1c1c] mb-4">Kalori Pada Makanan Pokok</h3>
+                    <div class="w-full border-b border-gray-200 mb-3"></div>
+                    <table class="w-full text-[12px]">
+                        <thead><tr class="text-left border-b border-gray-200"><th class="pb-3 pt-2 font-bold text-[#1c1c1c]">Makanan</th><th class="pb-3 pt-2 font-bold text-[#1c1c1c] text-right">Kalori</th></tr></thead>
+                        <tbody class="leading-loose">
+                            <tr><td class="py-2 text-gray-500">Nasi Putih 160 gram</td><td class="py-2 font-bold text-gray-800 text-right">175</td></tr>
+                            <tr><td class="py-2 text-gray-500">Singkong Rebus 200 gram</td><td class="py-2 font-bold text-gray-800 text-right">146</td></tr>
+                            <tr><td class="py-2 text-gray-500">Ketan Rebus 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">166</td></tr>
+                            <tr><td class="py-2 text-gray-500">Jagung Rebus 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">90</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-tabel-rendah-karbo" class="page-view px-5 py-6">
+                <div class="bg-[#f5f5f5] p-6 shadow-sm border border-gray-50">
+                    <h3 class="text-[16px] font-bold text-[#1c1c1c] mb-4">Diet Rendah Karbohidrat</h3>
+                    <div class="w-full border-b border-gray-200 mb-3"></div>
+                    <table class="w-full text-[12px]">
+                        <thead><tr class="text-left border-b border-gray-200"><th class="pb-3 pt-2 font-bold text-[#1c1c1c]">Makanan</th><th class="pb-3 pt-2 font-bold text-[#1c1c1c] text-right">Mengandung</th></tr></thead>
+                        <tbody class="leading-loose">
+                            <tr><td class="py-2 text-gray-500">Timun 160 gram</td><td class="py-2 font-bold text-gray-800 text-right">2.7 gr kh</td></tr>
+                            <tr><td class="py-2 text-gray-500">Telur 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">0.7</td></tr>
+                            <tr><td class="py-2 text-gray-500">daging Sapi dan ayam 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">0 gr kh</td></tr>
+                            <tr><td class="py-2 text-gray-500">Bayam 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">6.5 gr kh</td></tr>
+                            <tr><td class="py-2 text-gray-500">Kembang Kol 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">4.9 gr kh</td></tr>
+                            <tr><td class="py-2 text-gray-500">Kangkung 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">5.4 gr kh</td></tr>
+                            <tr><td class="py-2 text-gray-500">Alpukat 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">7.7 gr kh</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-tabel-rendah-lemak" class="page-view px-5 py-6">
+                <div class="bg-[#f5f5f5] p-6 shadow-sm border border-gray-50">
+                    <h3 class="text-[16px] font-bold text-[#1c1c1c] mb-4">Diet Rendah Lemak</h3>
+                    <div class="w-full border-b border-gray-200 mb-3"></div>
+                    <table class="w-full text-[12px]">
+                        <thead><tr class="text-left border-b border-gray-200"><th class="pb-3 pt-2 font-bold text-[#1c1c1c]">Makanan</th><th class="pb-3 pt-2 font-bold text-[#1c1c1c] text-right">Mengandung</th></tr></thead>
+                        <tbody class="leading-loose">
+                            <tr><td class="py-2 text-gray-500">Ikan Ekor Kuning 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">4 gram lemak</td></tr>
+                            <tr><td class="py-2 text-gray-500">Bandeng 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">4.8 gram lemak</td></tr>
+                            <tr><td class="py-2 text-gray-500">kacang hijau 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">1.2 gram lemak</td></tr>
+                            <tr><td class="py-2 text-gray-500">Buncis 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">0.2 gram lemak</td></tr>
+                            <tr><td class="py-2 text-gray-500">Bayam 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">0.5 gram lemak</td></tr>
+                            <tr><td class="py-2 text-gray-500">Kacang Panjang 100 gram</td><td class="py-2 font-bold text-gray-800 text-right">0.5 gram lemak</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-history" class="page-view px-5 py-6">
+                <h2 class="text-[15px] font-bold text-[#1c1c1c] mb-4">Riwayat Perhitungan</h2>
+                <div class="w-full border-b border-gray-100 mb-6"></div>
+                <div id="history-container" class="space-y-3">
+                    <!-- History dimuat via JS -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // State & LocalStorage
+        let historyData = JSON.parse(localStorage.getItem('ogani_history')) || [];
+        let latestBmi = JSON.parse(localStorage.getItem('ogani_latest_bmi')) || null;
+
+        // UI Functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            if(dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                dropdown.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+            
+            if(!document.getElementById('sidebar').classList.contains('-translate-x-full')) {
+                toggleSidebar();
+            }
+
+            if (pageId === 'page-history') renderHistory();
+            if (pageId === 'page-jadwal-diet') renderJadwalDiet();
+            if (pageId === 'page-jadwal-olahraga') renderJadwalOlahraga();
+        }
+
+        // Carousel Functions
+        const carouselItems = [
+            {name: 'FRESH FRUIT', img: 'https://images.unsplash.com/photo-1590004953392-5aba2e72269a?auto=format&fit=crop&w=300&q=80', icon: 'fa-lemon text-yellow-500'},
+            {name: 'DRIED FRUIT', img: 'https://images.unsplash.com/photo-1506459345248-c89b8ca5a2de?auto=format&fit=crop&w=300&q=80', icon: 'fa-seedling text-amber-700'},
+            {name: 'VEGETABLES', img: 'https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=300&q=80', icon: 'fa-carrot text-orange-500'},
+            {name: 'DRINK FRUIT', img: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=300&q=80', icon: 'fa-glass-water text-blue-400'},
+            {name: 'MEAT', img: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=300&q=80', icon: 'fa-drumstick-bite text-red-500'}
+        ];
+
+        let currentSlide = 0;
+        
+        function renderCarousel() {
+            const track = document.getElementById('carousel-track');
+            const shiftedItems = [...carouselItems.slice(currentSlide), ...carouselItems.slice(0, currentSlide)];
+            
+            track.innerHTML = shiftedItems.map(item => `
+                <div class="min-w-[33.33%] px-1.5 flex-shrink-0">
+                    <div class="bg-[#f9f9f9] rounded-sm flex flex-col items-center justify-between text-center h-32 p-1.5 shadow-sm border border-gray-100">
+                        <div class="h-16 w-16 rounded-full overflow-hidden border-2 border-white shadow-md mt-1">
+                            <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover" />
+                        </div>
+                        <span class="bg-white w-full py-2 mt-2 text-[8px] font-extrabold text-[#1c1c1c] tracking-wider rounded-b-sm shadow-sm uppercase leading-tight"><i class="fa-solid ${item.icon} mb-0.5"></i><br/>${item.name}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % carouselItems.length;
+            renderCarousel();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide === 0) ? carouselItems.length - 1 : currentSlide - 1;
+            renderCarousel();
+        }
+
+        // Auto slide interval
+        setInterval(nextSlide, 3000);
+
+        // Calculator Functions
+        function prosesKalori() {
+            const nama = document.getElementById('kalori-nama').value;
+            const berat = parseFloat(document.getElementById('kalori-berat').value);
+            const tinggi = parseFloat(document.getElementById('kalori-tinggi').value);
+            const usia = parseFloat(document.getElementById('kalori-usia').value);
+            const aktivitas = parseFloat(document.getElementById('kalori-aktivitas').value);
+            
+            if(!nama || !berat || !tinggi || !usia || !aktivitas) {
+                document.getElementById('error-kalori').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('error-kalori').classList.add('hidden');
+
+            let bmr = (10 * berat) + (6.25 * tinggi) - (5 * usia) + 5;
+            let rawCal = bmr * aktivitas;
+            let totalCal = rawCal.toFixed(3); // 3 desimal
+
+            document.getElementById('res-k-nama').textContent = nama;
+            document.getElementById('res-k-berat').textContent = berat;
+            document.getElementById('res-k-tinggi').textContent = tinggi;
+            document.getElementById('res-k-usia').textContent = usia;
+            document.getElementById('res-k-aktivitas').textContent = aktivitas;
+            document.getElementById('res-k-total').textContent = `${totalCal} kilo kalori`;
+            document.getElementById('hasil-kalori').classList.remove('hidden');
+
+            saveHistory({ type: 'Kebutuhan Kalori', nama: nama, result: `${totalCal} kcal`, status: 'Per Hari', date: new Date().toLocaleDateString() });
+        }
+
+        function prosesBmi() {
+            const nama = document.getElementById('bmi-nama').value;
+            const berat = parseFloat(document.getElementById('bmi-berat').value);
+            const tinggiCm = parseFloat(document.getElementById('bmi-tinggi').value);
+            
+            if(!nama || !berat || !tinggiCm) {
+                document.getElementById('error-bmi').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('error-bmi').classList.add('hidden');
+
+            const h = tinggiCm / 100; // Konversi ke meter
+            const bmi = (berat / (h * h)).toFixed(1);
+            
+            let status = '';
+            if(bmi < 18.5) status = 'Kekurangan Berat Badan';
+            else if(bmi >= 18.5 && bmi < 25) status = 'Normal (Ideal)';
+            else if(bmi >= 25 && bmi < 30) status = 'Kelebihan Berat Badan';
+            else status = 'Obesitas';
+
+            latestBmi = { status: status, result: bmi };
+            localStorage.setItem('ogani_latest_bmi', JSON.stringify(latestBmi));
+
+            document.getElementById('res-bmi-nama').textContent = nama;
+            document.getElementById('res-bmi-skor').textContent = bmi;
+            document.getElementById('res-bmi-status').textContent = status;
+            document.getElementById('hasil-bmi').classList.remove('hidden');
+
+            saveHistory({ type: 'Indeks Massa Tubuh (IMT)', nama: nama, result: bmi, status: status, date: new Date().toLocaleDateString() });
+        }
+
+        function saveHistory(data) {
+            historyData.unshift(data);
+            localStorage.setItem('ogani_history', JSON.stringify(historyData));
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            if(historyData.length === 0) {
+                container.innerHTML = `<div class="p-5 bg-[#f5f5f5] text-gray-400 text-[12px] text-center border border-gray-100">Belum ada riwayat perhitungan.</div>`;
+                return;
+            }
+            container.innerHTML = historyData.map(item => `
+                <div class="bg-white p-4 border border-gray-100 shadow-sm rounded-sm flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] text-[#7fad39] font-bold uppercase mb-1">${item.type}</p>
+                        <p class="text-[13px] text-[#1c1c1c] font-semibold">${item.nama}</p>
+                        <p class="text-[10px] text-gray-400">${item.date}</p>
+                    </div>
+                    <div class="text-right">
+                        <h4 class="text-[18px] font-extrabold text-[#1c1c1c]">${item.result}</h4>
+                        <p class="text-[11px] text-gray-500">${item.status}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderJadwalDiet() {
+            if(!latestBmi) {
+                document.getElementById('diet-no-data').classList.remove('hidden');
+                document.getElementById('diet-has-data').classList.add('hidden');
+                return;
+            }
+            document.getElementById('diet-no-data').classList.add('hidden');
+            document.getElementById('diet-has-data').classList.remove('hidden');
+
+            document.getElementById('diet-imt-status').textContent = latestBmi.status;
+            document.getElementById('diet-imt-skor').textContent = latestBmi.result;
+
+            let s = { pagi: '', siang: '', malam: '' };
+            if(latestBmi.status === 'Kekurangan Berat Badan') s = { pagi: 'Oatmeal pisang susu & Telur rebus (450 kcal)', siang: 'Nasi putih 150g, Ayam bakar, Tempe, Sayur bayam (600 kcal)', malam: 'Kentang rebus, Ikan, Alpukat (500 kcal)' };
+            else if(latestBmi.status === 'Normal (Ideal)') s = { pagi: 'Roti gandum, Selai kacang, Pisang (350 kcal)', siang: 'Nasi merah 100g, Ikan bakar, Tumis kangkung (450 kcal)', malam: 'Daging sapi tanpa lemak, Salad sayur (400 kcal)' };
+            else s = { pagi: 'Telur rebus 2 butir, Apel (200 kcal)', siang: 'Nasi merah 50g, Dada ayam rebus, Sayur buncis (350 kcal)', malam: 'Salad sayur dengan minyak zaitun, Ikan ekor kuning (250 kcal)' };
+
+            document.getElementById('diet-pagi').textContent = s.pagi;
+            document.getElementById('diet-siang').textContent = s.siang;
+            document.getElementById('diet-malam').textContent = s.malam;
+        }
+
+        function renderJadwalOlahraga() {
+            if(!latestBmi) {
+                document.getElementById('sport-no-data').classList.remove('hidden');
+                document.getElementById('sport-has-data').classList.add('hidden');
+                return;
+            }
+            document.getElementById('sport-no-data').classList.add('hidden');
+            document.getElementById('sport-has-data').classList.remove('hidden');
+
+            document.getElementById('sport-imt-status').textContent = latestBmi.status;
+            document.getElementById('sport-imt-skor').textContent = latestBmi.result;
+
+            let s = { senin: '', rabu: '', jumat: '', catatan: '' };
+            if(latestBmi.status === 'Kekurangan Berat Badan') s = { senin: 'Latihan beban ringan (Full body) - 30 menit', rabu: 'Yoga atau peregangan - 20 menit', jumat: 'Latihan beban ringan (Fokus inti) - 30 menit', catatan: 'Hindari kardio berlebihan. Fokus pada pembentukan massa otot.' };
+            else if(latestBmi.status === 'Normal (Ideal)') s = { senin: 'Jogging santai / Bersepeda - 30 menit', rabu: 'Latihan kekuatan (Push up, Sit up) - 30 menit', jumat: 'Berenang atau Senam aerobik - 45 menit', catatan: 'Pertahankan keseimbangan antara kardio dan latihan kekuatan.' };
+            else s = { senin: 'Jalan cepat (Brisk walking) - 45 menit', rabu: 'Senam aerobik low-impact - 30 menit', jumat: 'Berenang atau bersepeda santai - 45 menit', catatan: 'Fokus pada konsistensi. Hindari olahraga high-impact untuk melindungi sendi lutut.' };
+
+            document.getElementById('sport-senin').textContent = s.senin;
+            document.getElementById('sport-rabu').textContent = s.rabu;
+            document.getElementById('sport-jumat').textContent = s.jumat;
+            document.getElementById('sport-catatan').textContent = s.catatan;
+        }
+
+        // Initialize App
+        window.onload = function() {
+            renderCarousel();
+            renderHistory();
+        };
+    </script>
+</body>
+</html>
